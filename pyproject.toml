@@ -50,8 +50,6 @@ dependencies = [
 
 [project.optional-dependencies]
 stable = [
-    "torch<=2.4.1",
-    "torchaudio",
     "cachetools",
 ]
 

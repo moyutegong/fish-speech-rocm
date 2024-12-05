@@ -3,7 +3,7 @@ import locale
 from pathlib import Path
 
 I18N_FILE_PATH = Path(__file__).parent / "locale"
-DEFAULT_LANGUAGE = "en_US"
+DEFAULT_LANGUAGE = "zh_CN"
 
 
 def load_language_list(language):
@@ -26,15 +26,14 @@ class I18nAuto:
 
         if (I18N_FILE_PATH / f"{language}.json").exists() is False:
             language = DEFAULT_LANGUAGE
-
-        self.language = language
-        self.language_map = load_language_list(language)
+        self.language = "zh_CN"
+        self.language_map = load_language_list("zh_CN")
 
     def __call__(self, key):
         return self.language_map.get(key, key)
 
     def __repr__(self):
-        return "Use Language: " + self.language
+        return "zh_CN"
 
 
 i18n = I18nAuto()
