@@ -14,7 +14,7 @@ sudo apt install ./amdgpu-install_6.2.60203-1_all.deb
 amdgpu-install -y --usecase=wsl,rocm --no-dkms
 ```
 
-- **修复mportError: version 'GLIBCXX_3.4.30' not found异常**
+- **修复importError: version 'GLIBCXX_3.4.30' not found异常**
 
 ```
 ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ${CONDA_PREFIX}/lib/libstdc++.so.6
