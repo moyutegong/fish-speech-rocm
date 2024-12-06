@@ -3,21 +3,14 @@
 - **首先下载并安装amdgpu-install：**
 
 ```
-wget  https://repo.radeon.com/amdgpu-install/6.3/ubuntu/jammy/amdgpu-install_6.3.60300-1_all.deb  
-sudo apt install ./amdgpu-install_6.3.60300-1_all.deb  
+sudo apt update
+wget https://repo.radeon.com/amdgpu-install/6.2.3/ubuntu/jammy/amdgpu-install_6.2.60203-1_all.deb
+sudo apt install ./amdgpu-install_6.2.60203-1_all.deb
 ```
 
-- **然后下载hsa-runtime**
+- **安装rocm组件**
 
 ```
-wget https://repo.radeon.com/amdgpu/6.3/ubuntu/pool/main/h/hsa-runtime-rocr4wsl-amdgpu/hsa-runtime-rocr4wsl-amdgpu_24.30-2089753.22.04_amd64.deb
-```
-
-- **安装rocm组件并且如果报错就手动安装hsa-runtime**
-
-```
-amdgpu-install -y --usecase=wsl,rocm --no-dkms
-sudo apt install ./hsa-runtime-rocr4wsl-amdgpu_24.30-2089753.22.04_amd64.deb
 amdgpu-install -y --usecase=wsl,rocm --no-dkms
 ```
 
@@ -39,7 +32,7 @@ pip3 install torch torchvision torchaudio numpy==1.26.4 --index-url https://down
 location=`pip show torch | grep Location | awk -F ": " '{print $2}'`
 cd ${location}/torch/lib/
 rm libhsa-runtime64.so*
-cp /opt/rocm/lib/libhsa-runtime64.so.1 libhsa-runtime64.so
+cp /opt/rocm/lib/libhsa-runtime64.so.1.2 libhsa-runtime64.so
 ```
 
 - **测试是否安装成功**
