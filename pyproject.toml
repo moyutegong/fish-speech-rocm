@@ -46,11 +46,17 @@ dependencies = [
     "ormsgpack",
     "tiktoken>=0.8.0",
     "pydantic==2.9.2",
+    "cachetools",
 ]
 
 [project.optional-dependencies]
 stable = [
+<<<<<<< HEAD
     "cachetools",
+=======
+    "torch<=2.4.1",
+    "torchaudio",
+>>>>>>> b11bcf834a97a75073b535838e5f0765f169eb94
 ]
 
 [build-system]
