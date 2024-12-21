@@ -70,7 +70,7 @@ Fornecemos uma API HTTP para inferência. O seguinte comando pode ser usado para
 python -m tools.api_server \
     --listen 0.0.0.0:8080 \
     --llama-checkpoint-path "checkpoints/fish-speech-1.5" \
-    --decoder-checkpoint-path "checkpoints/fish-speech-1.4/firefly-gan-vq-fsq-8x1024-21hz-generator.pth" \
+    --decoder-checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth" \
     --decoder-config-name firefly_gan_vq
 ```
 
@@ -98,7 +98,7 @@ O comando acima indica a síntese do áudio desejada de acordo com as informaç�
 Para iniciar a WebUI de Inferência execute o seguinte comando:
 
 ```bash
-python -m tools.webui \
+python -m tools.run_webui \
     --llama-checkpoint-path "checkpoints/fish-speech-1.5" \
     --decoder-checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth" \
     --decoder-config-name firefly_gan_vq
