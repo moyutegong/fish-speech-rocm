@@ -7,7 +7,7 @@ import torch
 import torchaudio
 from loguru import logger
 
-from fish_speech.models.vqgan.modules.firefly import FireflyArchitecture
+from fish_speech.models.dac.modded_dac import DAC
 from fish_speech.utils.file import (
     AUDIO_EXTENSIONS,
     audio_to_bytes,
@@ -28,7 +28,7 @@ class ReferenceLoader:
         self.ref_by_hash: dict = {}
 
         # Make Pylance happy (attribut/method not defined...)
-        self.decoder_model: FireflyArchitecture
+        self.decoder_model: DAC
         self.encode_reference: Callable
 
         # Define the torchaudio backend
@@ -95,11 +95,13 @@ class ReferenceLoader:
                     )
                 )
                 prompt_texts.append(ref.text)
-                self.ref_by_hash[audio_hashes[i]] = (prompt_tokens, prompt_texts)
+                self.ref_by_hash[audio_hashes[i]] = (prompt_tokens[-1], ref.text)
 
             else:
                 # Reuse already encoded references
-                prompt_tokens, prompt_texts = self.ref_by_hash[audio_hashes[i]]
+                cached_token, cached_text = self.ref_by_hash[audio_hashes[i]]
+                prompt_tokens.append(cached_token)
+                prompt_texts.append(cached_text)
                 cache_used = True
 
         if cache_used:

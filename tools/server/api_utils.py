@@ -13,19 +13,18 @@ from tools.server.inference import inference_wrapper as inference
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("--mode", type=str, choices=["agent", "tts"], default="tts")
-    parser.add_argument("--load-asr-model", action="store_true")
+    parser.add_argument("--mode", type=str, choices=["tts"], default="tts")
     parser.add_argument(
         "--llama-checkpoint-path",
         type=str,
-        default="checkpoints/fish-speech-1.5",
+        default="checkpoints/openaudio-s1-mini",
     )
     parser.add_argument(
         "--decoder-checkpoint-path",
         type=str,
-        default="checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth",
+        default="checkpoints/openaudio-s1-mini/codec.pth",
     )
-    parser.add_argument("--decoder-config-name", type=str, default="firefly_gan_vq")
+    parser.add_argument("--decoder-config-name", type=str, default="modded_dac_vq")
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--half", action="store_true")
     parser.add_argument("--compile", action="store_true")

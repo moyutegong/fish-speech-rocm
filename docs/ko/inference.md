@@ -1,122 +1,76 @@
 # 추론
 
-추론은 명령줄, HTTP API, 그리고 웹 UI에서 지원됩니다.
+보코더 모델이 변경되어 이전보다 더 많은 VRAM이 필요하며, 원활한 추론을 위해 12GB를 권장합니다.
 
-!!! note
-    전체 추론 과정은 다음의 여러 단계로 구성됩니다:
+추론을 위해 명령줄, HTTP API, WebUI를 지원하며, 원하는 방법을 선택할 수 있습니다.
 
-    1. VQGAN을 사용하여 약 10초 분량의 음성을 인코딩합니다.
-    2. 인코딩된 시맨틱 토큰과 해당 텍스트를 예시로 언어 모델에 입력합니다.
-    3. 새로운 텍스트를 입력하면, 모델이 해당하는 시맨틱 토큰을 생성합니다.
-    4. 생성된 시맨틱 토큰을 VITS / VQGAN에 입력하여 음성을 디코딩하고 생성합니다.
+## 가중치 다운로드
 
-## 모델 다운로드
-필요한 `vqgan` 및 `llama` 모델을 Hugging Face 리포지토리에서 다운로드하세요.
+먼저 모델 가중치를 다운로드해야 합니다:
 
 ```bash
-huggingface-cli download fishaudio/fish-speech-1.5 --local-dir checkpoints/fish-speech-1.5
+huggingface-cli download fishaudio/openaudio-s1-mini --local-dir checkpoints/openaudio-s1-mini
 ```
 
 ## 명령줄 추론
-### 1. 음성에서 프롬프트 생성:
 
 !!! note
-    모델이 음색을 무작위로 선택하도록 하려면 이 단계를 건너뛸 수 있습니다.
+    모델이 임의로 음색을 선택하도록 하려면 이 단계를 건너뛸 수 있습니다.
 
-!!! warning "향후 버전 경고"
-    원래 경로(tools/vqgan/infernce.py)에서 접근할 수 있는 인터페이스는 유지했지만, 이 인터페이스는 향후 몇몇 버전에서 삭제될 수 있습니다. 가능한 한 빨리 코드를 변경하십시오.
+### 1. 참조 오디오에서 VQ 토큰 얻기
 
 ```bash
-python fish_speech/models/vqgan/inference.py \
-    -i "paimon.wav" \
-    --checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth"
+python fish_speech/models/dac/inference.py \
+    -i "ref_audio_name.wav" \
+    --checkpoint-path "checkpoints/openaudio-s1-mini/codec.pth"
 ```
 
-이 명령을 실행하면 `fake.npy` 파일을 얻게 됩니다.
+`fake.npy`와 `fake.wav`를 얻을 수 있습니다.
 
-### 2. 텍스트에서 시맨틱 토큰 생성:
-
-!!! warning "향후 버전 경고"
-    원래 경로(tools/llama/generate.py)에서 접근할 수 있는 인터페이스는 유지했지만, 이 인터페이스는 향후 몇몇 버전에서 삭제될 수 있습니다. 가능한 한 빨리 코드를 변경하십시오.
+### 2. 텍스트에서 의미 토큰 생성:
 
 ```bash
 python fish_speech/models/text2semantic/inference.py \
-    --text "변환할 텍스트" \
-    --prompt-text "참고할 텍스트" \
+    --text "변환하고 싶은 텍스트" \
+    --prompt-text "참조 텍스트" \
     --prompt-tokens "fake.npy" \
-    --checkpoint-path "checkpoints/fish-speech-1.5" \
-    --num-samples 2 \
     --compile
 ```
 
-이 명령을 실행하면 작업 디렉토리에 `codes_N` 파일이 생성되며, N은 0부터 시작하는 정수입니다.
+이 명령은 작업 디렉토리에 `codes_N` 파일을 생성합니다. 여기서 N은 0부터 시작하는 정수입니다.
 
 !!! note
-    빠른 추론을 위해 `--compile` 옵션을 사용하여 CUDA 커널을 결합할 수 있습니다 (~초당 30 토큰 -> ~초당 500 토큰).
-    `--compile` 매개변수를 주석 처리하여 가속화 옵션을 사용하지 않을 수도 있습니다.
+    더 빠른 추론을 위해 `--compile`을 사용하여 CUDA 커널을 융합할 수 있습니다(약 15 토큰/초 -> 약 150 토큰/초, RTX 4090 GPU).
+    이에 따라 가속을 사용하지 않으려면 `--compile` 매개변수를 주석 처리할 수 있습니다.
 
 !!! info
     bf16을 지원하지 않는 GPU의 경우 `--half` 매개변수를 사용해야 할 수 있습니다.
 
-### 3. 시맨틱 토큰에서 음성 생성:
+### 3. 의미 토큰에서 음성 생성:
 
-#### VQGAN 디코더
-
-!!! warning "향후 버전 경고"
-    원래 경로(tools/vqgan/infernce.py)에서 접근할 수 있는 인터페이스는 유지했지만, 이 인터페이스는 향후 몇몇 버전에서 삭제될 수 있습니다. 가능한 한 빨리 코드를 변경하십시오.
+!!! warning "향후 경고"
+    원래 경로(tools/vqgan/inference.py)에서 액세스 가능한 인터페이스를 유지하고 있지만, 이 인터페이스는 향후 릴리스에서 제거될 수 있으므로 가능한 한 빨리 코드를 변경해 주세요.
 
 ```bash
-python fish_speech/models/vqgan/inference.py \
-    -i "codes_0.npy" \
-    --checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth"
+python fish_speech/models/dac/inference.py \
+    -i "codes_0.npy"
 ```
 
 ## HTTP API 추론
 
-추론을 위한 HTTP API를 제공하고 있습니다. 아래의 명령어로 서버를 시작할 수 있습니다:
+추론을 위한 HTTP API를 제공합니다. 다음 명령으로 서버를 시작할 수 있습니다:
 
 ```bash
 python -m tools.api_server \
     --listen 0.0.0.0:8080 \
-    --llama-checkpoint-path "checkpoints/fish-speech-1.5" \
-    --decoder-checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth" \
-    --decoder-config-name firefly_gan_vq
+    --llama-checkpoint-path "checkpoints/openaudio-s1-mini" \
+    --decoder-checkpoint-path "checkpoints/openaudio-s1-mini/codec.pth" \
+    --decoder-config-name modded_dac_vq
 ```
 
-추론 속도를 높이고 싶다면 `--compile` 매개변수를 추가할 수 있습니다.
+> 추론을 가속화하려면 `--compile` 매개변수를 추가할 수 있습니다.
 
-이후, http://127.0.0.1:8080/ 에서 API를 확인하고 테스트할 수 있습니다.
-
-아래는 `tools/api_client.py`를 사용하여 요청을 보내는 예시입니다.
-
-```bash
-python -m tools.api_client \
-    --text "입력할 텍스트" \
-    --reference_audio "참고 음성 경로" \
-    --reference_text "참고 음성의 텍스트 내용" \
-    --streaming True
-```
-
-위 명령은 참고 음성 정보를 바탕으로 원하는 음성을 합성하고, 스트리밍 방식으로 반환합니다.
-
-다음 예시는 여러 개의 참고 음성 경로와 텍스트를 한꺼번에 사용할 수 있음을 보여줍니다. 명령에서 공백으로 구분하여 입력합니다.
-
-```bash
-python -m tools.api_client \
-    --text "입력할 텍스트" \
-    --reference_audio "참고 음성 경로1" "참고 음성 경로2" \
-    --reference_text "참고 음성 텍스트1" "참고 음성 텍스트2"\
-    --streaming False \
-    --output "generated" \
-    --format "mp3"
-```
-
-위 명령어는 여러 참고 음성 정보를 바탕으로 `MP3` 형식의 음성을 합성하여, 현재 디렉토리에 `generated.mp3`로 저장합니다.
-
-`--reference_audio`와 `--reference_text` 대신에 `--reference_id`(하나만 사용 가능)를 사용할 수 있습니다. 프로젝트 루트 디렉토리에 `references/<your reference_id>` 폴더를 만들어 해당 음성과 주석 텍스트를 넣어야 합니다. 참고 음성은 최대 90초까지 지원됩니다.
-
-!!! info 
-    제공되는 파라미터는 `python -m tools.api_client -h`를 사용하여 확인할 수 있습니다.
+그 후 http://127.0.0.1:8080/ 에서 API를 보고 테스트할 수 있습니다.
 
 ## GUI 추론 
 [클라이언트 다운로드](https://github.com/AnyaCoder/fish-speech-gui/releases)
@@ -127,17 +81,20 @@ python -m tools.api_client \
 
 ```bash
 python -m tools.run_webui \
-    --llama-checkpoint-path "checkpoints/fish-speech-1.5" \
-    --decoder-checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth" \
-    --decoder-config-name firefly_gan_vq
+    --llama-checkpoint-path "checkpoints/openaudio-s1-mini" \
+    --decoder-checkpoint-path "checkpoints/openaudio-s1-mini/codec.pth" \
+    --decoder-config-name modded_dac_vq
 ```
 
-> 추론 속도를 높이고 싶다면 `--compile` 매개변수를 추가할 수 있습니다.
+또는 간단히
+
+```bash
+python -m tools.run_webui
+```
+> 추론을 가속화하려면 `--compile` 매개변수를 추가할 수 있습니다.
 
 !!! note
-    라벨 파일과 참고 음성 파일을 미리 메인 디렉토리의 `references` 폴더에 저장해 두면, WebUI에서 바로 호출할 수 있습니다. (해당 폴더는 직접 생성해야 합니다.)
+    라벨 파일과 참조 오디오 파일을 메인 디렉토리의 `references` 폴더에 미리 저장할 수 있습니다(직접 생성해야 함). 이렇게 하면 WebUI에서 직접 호출할 수 있습니다.
 
 !!! note
-    WebUI를 구성하기 위해 `GRADIO_SHARE`, `GRADIO_SERVER_PORT`, `GRADIO_SERVER_NAME`과 같은 Gradio 환경 변수를 사용할 수 있습니다.
-
-즐기세요!
+    `GRADIO_SHARE`, `GRADIO_SERVER_PORT`, `GRADIO_SERVER_NAME`과 같은 Gradio 환경 변수를 사용하여 WebUI를 구성할 수 있습니다.

@@ -1,4 +1,14 @@
-# Fish Speech の紹介
+# OpenAudio (旧 Fish-Speech)
+
+<div align="center">
+
+<div align="center">
+
+<img src="../assets/openaudio.jpg" alt="OpenAudio" style="display: block; margin: 0 auto; width: 35%;"/>
+
+</div>
+
+<strong>先進的なText-to-Speechモデルシリーズ</strong>
 
 <div>
 <a target="_blank" href="https://discord.gg/Es5qTB9BcN">
@@ -12,161 +22,139 @@
 </a>
 </div>
 
-!!! warning
-    私たちは、コードベースの違法な使用について一切の責任を負いません。お住まいの地域の DMCA（デジタルミレニアム著作権法）およびその他の関連法を参照してください。 <br/>
-    このコードベースとモデルは、CC-BY-NC-SA-4.0 ライセンス下でリリースされています。
+<strong>今すぐ試す：</strong> <a href="https://fish.audio">Fish Audio Playground</a> | <strong>詳細情報：</strong> <a href="https://openaudio.com">OpenAudio ウェブサイト</a>
 
-<p align="center">
-   <img src="../assets/figs/diagram.png" width="75%">
-</p>
+</div>
 
-## 要件
+---
 
-- GPU メモリ: 4GB（推論用）、8GB（ファインチューニング用）
-- システム: Linux、Windows
+!!! note "ライセンス通知"
+    このコードベースは **Apacheライセンス** の下でリリースされ、すべてのモデル重みは **CC-BY-NC-SA-4.0ライセンス** の下でリリースされています。詳細は [LICENSE](LICENSE) を参照してください。
 
-## Windowsセットアップ
+!!! warning "法的免責事項"
+    コードベースの違法な使用について、当方は一切の責任を負いません。お住まいの地域のDMCAおよびその他の関連法規をご参照ください。
 
-!!! info "注意"
-    Windowsの専門ユーザー以外の方には、GUIを使用してプロジェクトを実行することを強くお勧めします。[GUIはこちら](https://github.com/AnyaCoder/fish-speech-gui).
+## **紹介**
 
-プロフェッショナルなWindowsユーザーは、WSL2またはDockerを使用してコードベースを実行することを検討してください。
+私たちは **OpenAudio** への改名を発表できることを嬉しく思います。Fish-Speechを基盤とし、大幅な改善と新機能を加えた、新しい先進的なText-to-Speechモデルシリーズを紹介します。
 
-```bash
-# Python 3.10の仮想環境を作成（virtualenvも使用可能）
-conda create -n fish-speech python=3.10
-conda activate fish-speech
+**Openaudio-S1-mini**: [ブログ](https://openaudio.com/blogs/s1); [動画](https://www.youtube.com/watch?v=SYuPvd7m06A); [Hugging Face](https://huggingface.co/fishaudio/openaudio-s1-mini);
 
-# PyTorchをインストール
-pip3 install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu121
+**Fish-Speech v1.5**: [動画](https://www.bilibili.com/video/BV1EKiDYBE4o/); [Hugging Face](https://huggingface.co/fishaudio/fish-speech-1.5);
 
-# fish-speechをインストール
-pip3 install -e .
+## **ハイライト**
 
-# (アクセラレーションを有効にする) triton-windowsをインストール
-pip install https://github.com/AnyaCoder/fish-speech/releases/download/v0.1.0/triton_windows-0.1.0-py3-none-any.whl
+### **優秀なTTS品質**
+
+Seed TTS評価指標を使用してモデルのパフォーマンスを評価した結果、OpenAudio S1は英語テキストで**0.008 WER**と**0.004 CER**を達成し、以前のモデルより大幅に改善されました。（英語、自動評価、OpenAI gpt-4o-転写に基づく、話者距離はRevai/pyannote-wespeaker-voxceleb-resnet34-LM使用）
+
+| モデル | 単語誤り率 (WER) | 文字誤り率 (CER) | 話者距離 |
+|:-----:|:--------------------:|:-------------------------:|:----------------:|
+| **S1** | **0.008** | **0.004** | **0.332** |
+| **S1-mini** | **0.011** | **0.005** | **0.380** |
+
+### **TTS-Arena2最高モデル**
+
+OpenAudio S1は[TTS-Arena2](https://arena.speechcolab.org/)で**#1ランキング**を達成しました。これはtext-to-speech評価のベンチマークです：
+
+<div align="center">
+    <img src="../assets/Elo.jpg" alt="TTS-Arena2 Ranking" style="width: 75%;" />
+</div>
+
+### **音声制御**
+OpenAudio S1は**多様な感情、トーン、特殊マーカーをサポート**して音声合成を強化します：
+
+- **基本感情**：
+```
+(怒った) (悲しい) (興奮した) (驚いた) (満足した) (喜んだ) 
+(怖がった) (心配した) (動揺した) (緊張した) (欲求不満な) (落ち込んだ)
+(共感した) (恥ずかしい) (嫌悪した) (感動した) (誇らしい) (リラックスした)
+(感謝した) (自信のある) (興味のある) (好奇心のある) (困惑した) (楽しい)
 ```
 
-## Linux セットアップ
-
-詳細については、[pyproject.toml](../../pyproject.toml)  を参照してください。
-```bash
-# python 3.10の仮想環境を作成します。virtualenvも使用できます。
-conda create -n fish-speech python=3.10
-conda activate fish-speech
-
-# pytorchをインストールします。
-pip3 install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1
-
-# (Ubuntu / Debianユーザー) sox + ffmpegをインストールします。
-apt install libsox-dev ffmpeg
-
-# (Ubuntu / Debianユーザー) pyaudio をインストールします。
-apt install build-essential \
-    cmake \
-    libasound-dev \
-    portaudio19-dev \
-    libportaudio2 \
-    libportaudiocpp0
-    
-# fish-speechをインストールします。
-pip3 install -e .[stable]
-
+- **高度な感情**：
+```
+(軽蔑的な) (不幸な) (不安な) (ヒステリックな) (無関心な) 
+(いらいらした) (罪悪感のある) (軽蔑的な) (パニックした) (激怒した) (不本意な)
+(熱心な) (不賛成の) (否定的な) (否定する) (驚いた) (真剣な)
+(皮肉な) (和解的な) (慰める) (誠実な) (冷笑的な)
+(躊躇する) (譲歩する) (痛々しい) (気まずい) (面白がった)
 ```
 
-## macos setup
+（現在英語、中国語、日本語をサポート、より多くの言語が近日公開予定！）
 
-推論をMPS上で行う場合は、`--device mps`フラグを追加してください。
-推論速度の比較は[こちらのPR](https://github.com/fishaudio/fish-speech/pull/461#issuecomment-2284277772)を参考にしてください。
-
-!!! warning
-    AppleSiliconのデバイスでは、compileオプションに正式に対応していませんので、推論速度が向上する保証はありません。
-
-```bash
-# create a python 3.10 virtual environment, you can also use virtualenv
-conda create -n fish-speech python=3.10
-conda activate fish-speech
-# install pytorch
-pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1
-# install fish-speech
-pip install -e .[stable]
+- **トーンマーカー**：
+```
+(急いだ調子で) (叫んで) (悲鳴をあげて) (ささやいて) (柔らかい調子で)
 ```
 
-## Docker セットアップ
+- **特殊音響効果**：
+```
+(笑って) (くすくす笑って) (すすり泣いて) (大声で泣いて) (ため息をついて) (息を切らして)
+(うめいて) (群衆の笑い声) (背景の笑い声) (観客の笑い声)
+```
 
-1. NVIDIA Container Toolkit のインストール：
+Ha,ha,haを使用してコントロールすることもでき、他にも多くの使用法があなた自身の探索を待っています。
 
-    Docker で GPU を使用してモデルのトレーニングと推論を行うには、NVIDIA Container Toolkit をインストールする必要があります：
+### **2つのモデルタイプ**
 
-    Ubuntu ユーザーの場合：
+異なるニーズに対応する2つのモデルバリエーションを提供しています：
 
-    ```bash
-    # リポジトリの追加
-    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-        && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-    # nvidia-container-toolkit のインストール
-    sudo apt-get update
-    sudo apt-get install -y nvidia-container-toolkit
-    # Docker サービスの再起動
-    sudo systemctl restart docker
-    ```
+- **OpenAudio S1 (40億パラメータ)**：[fish.audio](https://fish.audio) で利用可能な全機能搭載のフラッグシップモデルで、すべての高度な機能を備えた最高品質の音声合成を提供します。
 
-    他の Linux ディストリビューションを使用している場合は、以下のインストールガイドを参照してください：[NVIDIA Container Toolkit Install-guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)。
+- **OpenAudio S1-mini (5億パラメータ)**：コア機能を備えた蒸留版で、[Hugging Face Space](https://huggingface.co/spaces/fishaudio/openaudio-s1-mini) で利用可能です。優秀な品質を維持しながら、より高速な推論のために最適化されています。
 
-2. fish-speech イメージのプルと実行
+S1とS1-miniの両方にオンライン人間フィードバック強化学習（RLHF）が組み込まれています。
 
-    ```shell
-    # イメージのプル
-    docker pull fishaudio/fish-speech:latest-dev
-    # イメージの実行
-    docker run -it \
-        --name fish-speech \
-        --gpus all \
-        -p 7860:7860 \
-        fishaudio/fish-speech:latest-dev \
-        zsh
-    # 他のポートを使用する場合は、-p パラメータを YourPort:7860 に変更してください
-    ```
+## **機能**
 
-3. モデルの依存関係のダウンロード
+1. **ゼロショット・フューショットTTS：** 10〜30秒の音声サンプルを入力するだけで高品質なTTS出力を生成します。**詳細なガイドラインについては、[音声クローニングのベストプラクティス](https://docs.fish.audio/text-to-speech/voice-clone-best-practices)をご覧ください。**
 
-    Docker コンテナ内のターミナルにいることを確認し、huggingface リポジトリから必要な `vqgan` と `llama` モデルをダウンロードします。
+2. **多言語・言語横断サポート：** 多言語テキストを入力ボックスにコピー＆ペーストするだけで、言語を気にする必要はありません。現在、英語、日本語、韓国語、中国語、フランス語、ドイツ語、アラビア語、スペイン語をサポートしています。
 
-    ```bash
-    huggingface-cli download fishaudio/fish-speech-1.5 --local-dir checkpoints/fish-speech-1.5
-    ```
+3. **音素依存なし：** このモデルは強力な汎化能力を持ち、TTSに音素に依存しません。あらゆる言語スクリプトのテキストを処理できます。
 
-4. 環境変数の設定と WebUI へのアクセス
+4. **高精度：** Seed-TTS Evalで低い文字誤り率（CER）約0.4%と単語誤り率（WER）約0.8%を達成します。
 
-    Docker コンテナ内のターミナルで、`export GRADIO_SERVER_NAME="0.0.0.0"` と入力して、外部から Docker 内の gradio サービスにアクセスできるようにします。
-    次に、Docker コンテナ内のターミナルで `python tools/run_webui.py` と入力して WebUI サービスを起動します。
+5. **高速：** torch compile加速により、Nvidia RTX 4090でリアルタイム係数約1:7。
 
-    WSL または MacOS の場合は、[http://localhost:7860](http://localhost:7860) にアクセスして WebUI インターフェースを開くことができます。
+6. **WebUI推論：** Chrome、Firefox、Edge、その他のブラウザと互換性のあるGradioベースの使いやすいWebUIを備えています。
 
-    サーバーにデプロイしている場合は、localhost をサーバーの IP に置き換えてください。
+7. **GUI推論：** APIサーバーとシームレスに連携するPyQt6グラフィカルインターフェースを提供します。Linux、Windows、macOSをサポートします。[GUIを見る](https://github.com/AnyaCoder/fish-speech-gui)。
 
-## 変更履歴
+8. **デプロイフレンドリー：** Linux、Windows（MacOS近日公開）のネイティブサポートで推論サーバーを簡単にセットアップし、速度低下を最小化します。
 
-- 2024/12/03: Fish-Speech を 1.5にアップデートし、より多くの言語をサポートするようになりました。オープンソース領域ではSOTA（最先端）となっています。
-- 2024/09/10: Fish-Speech を Ver.1.4 に更新し、データセットのサイズを増加させ、quantizer n_groups を 4 から 8 に変更しました。
-- 2024/07/02: Fish-Speech を Ver.1.2 に更新し、VITS デコーダーを削除し、ゼロショット能力を大幅に強化しました。
-- 2024/05/10: Fish-Speech を Ver.1.1 に更新し、VITS デコーダーを実装して WER を減少させ、音色の類似性を向上させました。
-- 2024/04/22: Fish-Speech Ver.1.0 を完成させ、VQGAN および LLAMA モデルを大幅に修正しました。
-- 2023/12/28: `lora`微調整サポートを追加しました。
-- 2023/12/27: `gradient checkpointing`、`causual sampling`、および`flash-attn`サポートを追加しました。
-- 2023/12/19: webui および HTTP API を更新しました。
-- 2023/12/18: 微調整ドキュメントおよび関連例を更新しました。
-- 2023/12/17: `text2semantic`モデルを更新し、自由音素モードをサポートしました。
-- 2023/12/13: ベータ版をリリースし、VQGAN モデルおよび LLAMA に基づく言語モデル（音素のみサポート）を含みます。
+## **メディア・デモ**
 
-## 謝辞
+<!-- <div align="center"> -->
 
-- [VITS2 (daniilrobnikov)](https://github.com/daniilrobnikov/vits2)
-- [Bert-VITS2](https://github.com/fishaudio/Bert-VITS2)
-- [GPT VITS](https://github.com/innnky/gpt-vits)
-- [MQTTS](https://github.com/b04901014/MQTTS)
-- [GPT Fast](https://github.com/pytorch-labs/gpt-fast)
-- [Transformers](https://github.com/huggingface/transformers)
-- [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS)
+<h3><strong>ソーシャルメディア</strong></h3>
+<a href="https://x.com/FishAudio/status/1929915992299450398" target="_blank">
+    <img src="https://img.shields.io/badge/𝕏-最新デモ-black?style=for-the-badge&logo=x&logoColor=white" alt="Latest Demo on X" />
+</a>
+
+<h3><strong>インタラクティブデモ</strong></h3>
+
+<a href="https://fish.audio" target="_blank">
+    <img src="https://img.shields.io/badge/Fish_Audio-OpenAudio_S1を試す-blue?style=for-the-badge" alt="Try OpenAudio S1" />
+</a>
+<a href="https://huggingface.co/spaces/fishaudio/openaudio-s1-mini" target="_blank">
+    <img src="https://img.shields.io/badge/Hugging_Face-S1_Miniを試す-yellow?style=for-the-badge" alt="Try S1 Mini" />
+</a>
+
+<h3><strong>動画ショーケース</strong></h3>
+<div align="center">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/SYuPvd7m06A" title="OpenAudio S1 Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+## **ドキュメント**
+
+### クイックスタート
+- [環境構築](install.md) - 開発環境をセットアップ
+- [推論ガイド](inference.md) - モデルを実行して音声を生成
+
+## **コミュニティ・サポート**
+
+- **Discord：** [Discordコミュニティ](https://discord.gg/Es5qTB9BcN)に参加
+- **ウェブサイト：** 最新アップデートは[OpenAudio.com](https://openaudio.com)をご覧ください
+- **オンライン試用：** [Fish Audio Playground](https://fish.audio)

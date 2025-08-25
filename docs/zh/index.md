@@ -1,4 +1,14 @@
-# 介绍
+# OpenAudio (原 Fish-Speech)
+
+<div align="center">
+
+<div align="center">
+
+<img src="../assets/openaudio.jpg" alt="OpenAudio" style="display: block; margin: 0 auto; width: 35%;"/>
+
+</div>
+
+<strong>先进的文字转语音模型系列</strong>
 
 <div>
 <a target="_blank" href="https://discord.gg/Es5qTB9BcN">
@@ -10,171 +20,141 @@
 <a target="_blank" href="https://hub.docker.com/r/fishaudio/fish-speech">
 <img alt="Docker" src="https://img.shields.io/docker/pulls/fishaudio/fish-speech?style=flat-square&logo=docker"/>
 </a>
+</div>·
+
+<strong>立即试用：</strong> <a href="https://fish.audio">Fish Audio Playground</a> | <strong>了解更多：</strong> <a href="https://openaudio.com">OpenAudio 网站</a>
+
 </div>
 
-!!! warning "警告"
-    我们不对代码库的任何非法使用承担任何责任. 请参阅您当地关于 DMCA (数字千年法案) 和其他相关法律法规. <br/>
-    此代码库与所有模型根据 CC-BY-NC-SA-4.0 许可证发布.
+---
 
-<p align="center">
-   <img src="../assets/figs/diagram.png" width="75%">
-</p>
+!!! note "许可证声明"
+    此代码库在 **Apache 许可证** 下发布，所有模型权重在 **CC-BY-NC-SA-4.0 许可证** 下发布。更多详情请参阅 [LICENSE](LICENSE)。
 
-## 要求
+!!! warning "法律免责声明"
+    我们不对代码库的任何非法使用承担责任。请参考您所在地区有关 DMCA 和其他相关法律的规定。
 
-- GPU 内存: 4GB (用于推理), 8GB (用于微调)
-- 系统: Linux, Windows
+## **介绍**
 
-## Windows 配置
+我们很高兴地宣布，我们已经更名为 **OpenAudio** - 推出全新的先进文字转语音模型系列，在 Fish-Speech 的基础上进行了重大改进并增加了新功能。
 
-!!! info "注意"
-    我们强烈建议非Windows专业用户使用GUI运行该项目。[GUI在这里](https://github.com/AnyaCoder/fish-speech-gui).
+**Openaudio-S1-mini**: [博客](https://openaudio.com/blogs/s1); [视频](https://www.youtube.com/watch?v=SYuPvd7m06A); [Hugging Face](https://huggingface.co/fishaudio/openaudio-s1-mini);
 
+**Fish-Speech v1.5**: [视频](https://www.bilibili.com/video/BV1EKiDYBE4o/); [Hugging Face](https://huggingface.co/fishaudio/fish-speech-1.5);
 
-Windows 专业用户可以考虑 WSL2 或 docker 来运行代码库。
+## **亮点**
 
-```bash
-# 创建一个 python 3.10 虚拟环境, 你也可以用 virtualenv
-conda create -n fish-speech python=3.10
-conda activate fish-speech
+### **优秀的 TTS 质量**
 
-# 安装 pytorch
-pip3 install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu121
+我们使用 Seed TTS 评估指标来评估模型性能，结果显示 OpenAudio S1 在英文文本上达到了 **0.008 WER** 和 **0.004 CER**，明显优于以前的模型。（英语，自动评估，基于 OpenAI gpt-4o-转录，说话人距离使用 Revai/pyannote-wespeaker-voxceleb-resnet34-LM）
 
-# 安装 fish-speech
-pip3 install -e .
+| 模型 | 词错误率 (WER) | 字符错误率 (CER) | 说话人距离 |
+|:-----:|:--------------------:|:-------------------------:|:----------------:|
+| **S1** | **0.008** | **0.004** | **0.332** |
+| **S1-mini** | **0.011** | **0.005** | **0.380** |
 
-# (开启编译加速) 安装 triton-windows
-pip install https://github.com/AnyaCoder/fish-speech/releases/download/v0.1.0/triton_windows-0.1.0-py3-none-any.whl
+### **TTS-Arena2 最佳模型**
+
+OpenAudio S1 在 [TTS-Arena2](https://arena.speechcolab.org/) 上获得了 **#1 排名**，这是文字转语音评估的基准：
+
+<div align="center">
+    <img src="../assets/Elo.jpg" alt="TTS-Arena2 Ranking" style="width: 75%;" />
+</div>
+
+### **语音控制**
+OpenAudio S1 **支持多种情感、语调和特殊标记**来增强语音合成效果：
+
+- **基础情感**：
+```
+(生气) (伤心) (兴奋) (惊讶) (满意) (高兴) 
+(害怕) (担心) (沮丧) (紧张) (失望) (沮丧)
+(共情) (尴尬) (厌恶) (感动) (自豪) (放松)
+(感激) (自信) (感兴趣) (好奇) (困惑) (快乐)
 ```
 
-## Linux 配置
-
-有关详细信息，请参见 [pyproject.toml](../../pyproject.toml)。
-```bash
-# 创建一个 python 3.10 虚拟环境, 你也可以用 virtualenv
-conda create -n fish-speech python=3.10
-conda activate fish-speech
-
-# 安装 pytorch
-pip3 install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1
-
-# (Ubuntu / Debian 用户) 安装 sox + ffmpeg
-apt install libsox-dev ffmpeg
-
-# (Ubuntu / Debian 用户) 安装 pyaudio
-apt install build-essential \
-    cmake \
-    libasound-dev \
-    portaudio19-dev \
-    libportaudio2 \
-    libportaudiocpp0
-    
-# 安装 fish-speech
-pip3 install -e .[stable]
+- **高级情感**：
+```
+(鄙视) (不高兴) (焦虑) (歇斯底里) (漠不关心) 
+(不耐烦) (内疚) (轻蔑) (恐慌) (愤怒) (不情愿)
+(渴望) (不赞成) (否定) (否认) (惊讶) (严肃)
+(讽刺) (和解) (安慰) (真诚) (冷笑)
+(犹豫) (让步) (痛苦) (尴尬) (开心)
 ```
 
-## macos 配置
+（现在支持英语、中文和日语，更多语言即将推出！）
 
-如果您想在 MPS 上进行推理，请添加 `--device mps` 标志。
-有关推理速度的比较，请参考 [此 PR](https://github.com/fishaudio/fish-speech/pull/461#issuecomment-2284277772)。
-
-!!! 警告
-    `compile` 选项在 Apple Silicon 设备上尚未正式支持，因此推理速度没有提升的保证。
-
-```bash
-# create a python 3.10 virtual environment, you can also use virtualenv
-conda create -n fish-speech python=3.10
-conda activate fish-speech
-# install pytorch
-pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1
-# install fish-speech
-pip install -e .[stable]
+- **语调标记**：
+```
+(匆忙的语调) (大喊) (尖叫) (耳语) (轻声)
 ```
 
-## Docker 配置
+- **特殊音效**：
+```
+(笑) (轻笑) (抽泣) (大哭) (叹气) (喘气)
+(呻吟) (群体笑声) (背景笑声) (观众笑声)
+```
 
-1. 安装 NVIDIA Container Toolkit：
+您还可以使用 Ha,ha,ha 来控制，还有许多其他用法等待您自己探索。
 
-    Docker 如果想使用 GPU 进行模型训练和推理，需要安装 NVIDIA Container Toolkit ：
+### **两种模型类型**
 
-    对于 Ubuntu 用户：
+我们提供两种模型变体以满足不同需求：
 
-    ```bash
-    # 添加远程仓库
-    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-        && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-    # 安装 nvidia-container-toolkit
-    sudo apt-get update
-    sudo apt-get install -y nvidia-container-toolkit
-    # 重启 Docker 服务
-    sudo systemctl restart docker
-    ```
+- **OpenAudio S1 (40亿参数)**：我们功能齐全的旗舰模型，可在 [fish.audio](https://fish.audio) 上使用，提供最高质量的语音合成和所有高级功能。
 
-    对于使用其他 Linux 发行版的用户，安装指南请参考：[NVIDIA Container Toolkit Install-guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)。
+- **OpenAudio S1-mini (5亿参数)**：具有核心功能的蒸馏版本，可在 [Hugging Face Space](https://huggingface.co/spaces/fishaudio/openaudio-s1-mini) 上使用，针对更快推理进行优化，同时保持出色的质量。
 
-    注：对于中国大陆的用户，您可能需要使用代理来完成相关工具的安装。
+S1 和 S1-mini 都集成了在线人类反馈强化学习 (RLHF)。
 
-2. 拉取并运行 fish-speech 镜像
+## **功能特性**
 
-    ```shell
-    # 拉取镜像
-    docker pull fishaudio/fish-speech:latest-dev
-    # 运行镜像
-    docker run -it \
-        --name fish-speech \
-        --gpus all \
-        -p 7860:7860 \
-        fishaudio/fish-speech:latest-dev \
-        zsh
-    # 如果需要使用其他端口，请修改 -p 参数为 YourPort:7860
-    ```
+1. **零样本和少样本 TTS：** 输入 10 到 30 秒的语音样本即可生成高质量的 TTS 输出。**详细指南请参见 [语音克隆最佳实践](https://docs.fish.audio/text-to-speech/voice-clone-best-practices)。**
 
-3. 下载模型依赖
+2. **多语言和跨语言支持：** 只需复制粘贴多语言文本到输入框即可——无需担心语言问题。目前支持英语、日语、韩语、中文、法语、德语、阿拉伯语和西班牙语。
 
-    确保您在 docker 容器内的终端，然后再从我们的 huggingface 仓库下载所需的 `vqgan` 和 `llama` 模型。
+3. **无音素依赖：** 该模型具有强大的泛化能力，不依赖音素进行 TTS。它可以处理任何语言文字的文本。
 
-    ```bash
-    huggingface-cli download fishaudio/fish-speech-1.5 --local-dir checkpoints/fish-speech-1.5
-    ```
+4. **高度准确：** 在 Seed-TTS Eval 中实现低字符错误率 (CER) 约 0.4% 和词错误率 (WER) 约 0.8%。
 
-    对于中国大陆用户，可以通过镜像站下载。
+5. **快速：** 通过 torch compile 加速，在 Nvidia RTX 4090 GPU 上实时因子 (RTF) 约为 1:7。
 
-    ```bash
-    HF_ENDPOINT=https://hf-mirror.com huggingface-cli download fishaudio/fish-speech-1.5 --local-dir checkpoints/fish-speech-1.5
-    ```
+6. **WebUI 推理：** 具有易于使用的基于 Gradio 的网络界面，兼容 Chrome、Firefox、Edge 和其他浏览器。
 
-4. 配置环境变量，访问 WebUI
+7. **GUI 推理：** 提供与 API 服务器无缝配合的 PyQt6 图形界面。支持 Linux、Windows 和 macOS。[查看 GUI](https://github.com/AnyaCoder/fish-speech-gui)。
 
-    在 docker 容器内的终端，输入 `export GRADIO_SERVER_NAME="0.0.0.0"` ，从而让外部可以访问 docker 内的 gradio 服务。
-    接着在 docker 容器内的终端，输入 `python tools/run_webui.py` 即可开启 WebUI 服务。
+8. **部署友好：** 轻松设置推理服务器，原生支持 Linux、Windows（MacOS 即将推出），最小化速度损失。
 
-    如果是 WSL 或者是 MacOS ，访问 [http://localhost:7860](http://localhost:7860) 即可打开 WebUI 界面。
+## **媒体和演示**
 
-    如果是部署在服务器上，更换 localhost 为您的服务器 ip 即可。
+<!-- <div align="center"> -->
 
-## 更新日志
+<h3><strong>社交媒体</strong></h3>
+<a href="https://x.com/FishAudio/status/1929915992299450398" target="_blank">
+    <img src="https://img.shields.io/badge/𝕏-最新演示-black?style=for-the-badge&logo=x&logoColor=white" alt="Latest Demo on X" />
+</a>
 
-- 2024/12/03: 更新了 Fish-Speech 到 1.5，增加更多支持语言，在开源领域属于SOTA.
-- 2024/09/10: 更新了 Fish-Speech 到 1.4, 增加了数据集大小， quantizer n_groups 4 -> 8.
-- 2024/07/02: 更新了 Fish-Speech 到 1.2 版本，移除 VITS Decoder，同时极大幅度提升 zero-shot 能力.
-- 2024/05/10: 更新了 Fish-Speech 到 1.1 版本，引入了 VITS Decoder 来降低口胡和提高音色相似度.
-- 2024/04/22: 完成了 Fish-Speech 1.0 版本, 大幅修改了 VQGAN 和 LLAMA 模型.
-- 2023/12/28: 添加了 `lora` 微调支持.
-- 2023/12/27: 添加了 `gradient checkpointing`, `causual sampling` 和 `flash-attn` 支持.
-- 2023/12/19: 更新了 Webui 和 HTTP API.
-- 2023/12/18: 更新了微调文档和相关例子.
-- 2023/12/17: 更新了 `text2semantic` 模型, 支持无音素模式.
-- 2023/12/13: 测试版发布, 包含 VQGAN 模型和一个基于 LLAMA 的语言模型 (只支持音素).
+<h3><strong>互动演示</strong></h3>
 
-## 致谢
+<a href="https://fish.audio" target="_blank">
+    <img src="https://img.shields.io/badge/Fish_Audio-试用_OpenAudio_S1-blue?style=for-the-badge" alt="Try OpenAudio S1" />
+</a>
+<a href="https://huggingface.co/spaces/fishaudio/openaudio-s1-mini" target="_blank">
+    <img src="https://img.shields.io/badge/Hugging_Face-试用_S1_Mini-yellow?style=for-the-badge" alt="Try S1 Mini" />
+</a>
 
-- [VITS2 (daniilrobnikov)](https://github.com/daniilrobnikov/vits2)
-- [Bert-VITS2](https://github.com/fishaudio/Bert-VITS2)
-- [GPT VITS](https://github.com/innnky/gpt-vits)
-- [MQTTS](https://github.com/b04901014/MQTTS)
-- [GPT Fast](https://github.com/pytorch-labs/gpt-fast)
-- [Transformers](https://github.com/huggingface/transformers)
-- [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS)
+<h3><strong>视频展示</strong></h3>
+<div align="center">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/SYuPvd7m06A" title="OpenAudio S1 Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+## **文档**
+
+### 快速开始
+- [构建环境](install.md) - 设置您的开发环境
+- [推理指南](inference.md) - 运行模型并生成语音
+
+## **社区和支持**
+
+- **Discord：** 加入我们的 [Discord 社区](https://discord.gg/Es5qTB9BcN)
+- **网站：** 访问 [OpenAudio.com](https://openaudio.com) 获取最新更新
+- **在线试用：** [Fish Audio Playground](https://fish.audio)
